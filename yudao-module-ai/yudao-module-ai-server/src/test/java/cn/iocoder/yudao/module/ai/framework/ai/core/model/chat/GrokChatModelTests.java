@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
+import static cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelTestUtils.validateApiKey;
 
 /**
  * {@link GrokChatModel} 集成测试
@@ -33,7 +33,7 @@ public class GrokChatModelTests {
 
     private final GrokChatModel chatModel = new GrokChatModel(OpenAiChatModel.builder()
             .options(OpenAiChatOptions.builder()
-                    .baseUrl(GrokChatModel.BASE_URL)
+                    .baseUrl(GrokChatModel.BASE_URL + "/v1")
                     .apiKey(API_KEY)
                     .model(MODEL)
                     .temperature(0.7)

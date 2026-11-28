@@ -6,10 +6,10 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.mybatis.core.injector.SelectForUpdateMethod;
 import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
@@ -45,6 +45,19 @@ import java.util.Objects;
  * 2. {@link MPJBaseMapper} 为 MyBatis Plus Join 的基础接口，提供连表 Join 能力
  */
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
+
+    /**
+     * Wrapper 的 set(column, null, mapping) 使用：显式声明 VARCHAR 类型
+     *
+     * 原因：未指定 jdbcType 时，null 值按 MyBatis 的 jdbcTypeForNull（默认 OTHER）传入，Oracle、达梦等数据库可能报错
+     */
+    String JDBC_TYPE_VARCHAR = "jdbcType=VARCHAR";
+    /**
+     * Wrapper 的 set(column, null, mapping) 使用：显式声明 INTEGER 类型，用于整数字段
+     *
+     * 原因：同 {@link #JDBC_TYPE_VARCHAR}；整数字段不能用 VARCHAR，否则 PostgreSQL 等强类型数据库会报类型不匹配
+     */
+    String JDBC_TYPE_INTEGER = "jdbcType=INTEGER";
 
     default PageResult<T> selectPage(SortablePageParam pageParam, @Param("ew") Wrapper<T> queryWrapper) {
         return selectPage(pageParam, pageParam.getSortingFields(), queryWrapper);
@@ -321,6 +334,16 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     default T selectFirstOne(SFunction<T, ?> field, Object value) {
         List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field, value));
         return CollUtil.getFirst(list);
+    }
+
+    /**
+     * 获取满足条件的第 1 条记录
+     *
+     * @param queryWrapper 查询条件
+     * @return 实体
+     */
+    default T selectFirstOne(LambdaQueryWrapper<T> queryWrapper) {
+        return selectFirstOne((Wrapper<T>) queryWrapper);
     }
 
     default T selectFirstOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {

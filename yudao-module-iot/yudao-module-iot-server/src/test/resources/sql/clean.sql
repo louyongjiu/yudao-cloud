@@ -10,3 +10,8 @@ DELETE FROM "iot_ota_firmware";
 DELETE FROM "iot_ota_task";
 DELETE FROM "iot_ota_record";
 DELETE FROM "iot_data_rule";
+DELETE FROM "iot_device_modbus_point";
+DELETE FROM "iot_device_opc_ua_config";
+DELETE FROM "iot_device_opc_ua_point";
+DELETE FROM "iot_opc_ua_server_config";
+DELETE FROM "iot_opc_ua_server_node";
